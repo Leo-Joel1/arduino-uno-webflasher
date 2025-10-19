@@ -9,8 +9,8 @@
   <button id="flash">Connect & Flash</button>
   <pre id="log"></pre>
 
-  <!-- Correct UMD build -->
-  <script src="https://unpkg.com/arduino-create-agent-js-client/dist/ArduinoCreateAgentClient.umd.js"></script>
+  <!-- Browser-ready uploader -->
+  <script src="https://unpkg.com/@arduino/arduino-web-uploader/dist/arduino-web-uploader.js"></script>
   <script>
     const log = (msg) => {
       document.getElementById("log").textContent += msg + "\n";
@@ -19,16 +19,30 @@
     async function flashUno() {
       try {
         log("Connecting to Arduino Cloud Agent...");
-        const client = new ArduinoCreateAgentClient();
-        await client.init();
+
+        // Initialize uploader
+        const uploader = new ArduinoWebUploader();
+
+        await uploader.connect();
         log("Agent connected!");
 
-        const ports = await client.listPorts();
+        // Pick the first available board
+        const ports = await uploader.listPorts();
         if (!ports.length) {
           log("No boards detected!");
           return;
         }
         log("Board detected: " + ports[0].address);
+
+        // Fetch firmware
+        const firmwareUrl = "Digital_Clock-Timer_aug20a.ino.hex";
+        log("Fetching firmware...");
+        const hex = await fetch(firmwareUrl).then(r => r.text());
+
+        // Upload firmware
+        log("Uploading...");
+        await uploader.flash(ports[0].address, hex);
+        log("Upload complete!");
       } catch (err) {
         log("Error: " + err);
       }
