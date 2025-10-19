@@ -9,8 +9,13 @@
   <button id="flash">Connect & Flash</button>
   <pre id="log"></pre>
 
-  <script src="https://unpkg.com/arduino-create-agent-js-client/index.js"></script>
-  <script>
+ <script src="https://unpkg.com/arduino-create-agent-js-client/dist/ArduinoCreateAgentClient.umd.js"></script>
+<script>
+  const client = new ArduinoCreateAgentClient();
+  client.init().then(() => {
+    console.log("Agent connected!");
+  });
+</script>
     const log = (msg) => {
       document.getElementById("log").textContent += msg + "\n";
     };
