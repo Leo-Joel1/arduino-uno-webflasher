@@ -9,6 +9,7 @@
   <button id="flash">Connect & Flash</button>
   <pre id="log"></pre>
 
+  <script src="https://unpkg.com/arduino-create-agent-js-client/index.js"></script>
   <script>
     const log = (msg) => {
       document.getElementById("log").textContent += msg + "\n";
@@ -16,33 +17,28 @@
 
     async function flashUno() {
       try {
-        const agentUrl = "http://localhost:8991/"; // Cloud Agent API
         log("Connecting to Arduino Cloud Agent...");
+        const client = new ArduinoCreateAgentClient();
 
-        // List connected boards
-        let boards = await fetch(agentUrl + "/boards").then(r => r.json());
-        if (!boards.length) {
+        await client.init(); // handshake with Agent
+        log("Agent connected!");
+
+        // List available ports
+        const ports = await client.listPorts();
+        if (!ports.length) {
           log("No boards detected!");
           return;
         }
-        log("Board detected: " + boards[0].name);
+        log("Board detected: " + ports[0].address);
 
-        // Fetch your firmware
-        const firmwareUrl = "Digital_Clock-Timer_aug20a.ino.hex"; // must be hosted in same folder
+        // Fetch firmware
+        const firmwareUrl = "Digital_Clock-Timer_aug20a.ino.hex";
         log("Fetching firmware...");
-        let hex = await fetch(firmwareUrl).then(r => r.text());
+        const hex = await fetch(firmwareUrl).then(r => r.text());
 
         // Upload firmware
         log("Uploading...");
-        await fetch(agentUrl + "/upload", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            board: boards[0].name,
-            sketch: hex
-          })
-        });
-
+        await client.flash(ports[0].address, hex);
         log("Upload complete!");
       } catch (err) {
         log("Error: " + err);
