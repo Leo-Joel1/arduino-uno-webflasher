@@ -2,24 +2,57 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Arduino Uno Web Flasher</title>
+  <title>Arduino Web Flasher</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    select, button { margin: 10px 0; padding: 8px; }
+    pre { background: #f4f4f4; padding: 10px; border: 1px solid #ccc; }
+  </style>
 </head>
 <body>
-  <h1>Arduino Uno Web Flasher</h1>
+  <h1>Arduino Web Flasher</h1>
+
+  <!-- Board selector -->
+  <label for="board">Select Board:</label>
+  <select id="board">
+    <option value="uno" selected>Arduino Uno</option>
+    <option value="nano">Arduino Nano</option>
+    <option value="mega">Arduino Mega</option>
+    <option value="leonardo">Arduino Leonardo</option>
+  </select>
+
+  <!-- Upload button -->
+  <button id="flash">Connect & Flash</button>
+
+  <!-- Log output -->
+  <pre id="log"></pre>
 
   <!-- Load Arduino Web Uploader -->
   <script src="https://unpkg.com/@arduino/arduino-web-uploader/dist/arduino-web-uploader.js"></script>
+  <script>
+    const log = (msg) => {
+      document.getElementById("log").textContent += msg + "\n";
+    };
 
-  <!-- This renders the Upload button -->
-  <arduino-uploader
-    hex-url="Digital_Clock-Timer_aug20a.ino.hex"
-    board="uno"
-    style="display:block; margin:20px 0;">
-  </arduino-uploader>
+    document.getElementById("flash").addEventListener("click", async () => {
+      try {
+        const board = document.getElementById("board").value;
+        const hexUrl = board + ".hex"; // expects uno.hex, nano.hex, etc. in same folder
 
-  <p>
-    Make sure the Arduino Cloud Agent is running on your computer and your Uno is plugged in.
-    Then click the Upload button above to flash your firmware.
-  </p>
+        log("Connecting to Arduino Cloud Agent...");
+        const uploader = new ArduinoWebUploader();
+
+        await uploader.connect();
+        log("Agent connected!");
+
+        log("Flashing " + board + " with " + hexUrl + "...");
+        await uploader.upload({ board, hexUrl });
+
+        log("Upload complete!");
+      } catch (err) {
+        log("Error: " + err);
+      }
+    });
+  </script>
 </body>
 </html>
