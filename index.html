@@ -10,16 +10,16 @@
   <!-- Load Arduino Web Uploader -->
   <script src="https://unpkg.com/@arduino/arduino-web-uploader/dist/arduino-web-uploader.js"></script>
 
-  <!-- Drop-in uploader component -->
+  <!-- This renders the Upload button -->
   <arduino-uploader
     hex-url="Digital_Clock-Timer_aug20a.ino.hex"
     board="uno"
-    style="display:block; margin:20px 0; font-family:sans-serif;">
+    style="display:block; margin:20px 0;">
   </arduino-uploader>
 
   <p>
-    Click the button above to connect to the Arduino Cloud Agent and flash your Uno.
-    Make sure the Agent is running on your computer and your board is plugged in.
+    Make sure the Arduino Cloud Agent is running on your computer and your Uno is plugged in.
+    Then click the Upload button above to flash your firmware.
   </p>
 </body>
 </html>
